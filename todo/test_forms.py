@@ -5,13 +5,31 @@ from .forms import ItemForm
 class TestItemForm(TestCase):
 
     def test_item_name_is_required(self):
-        self.assertEqual(1, 1)
+        form = ItemForm({'name': ''})
 
-    def test_this_thing_works2(self):
-        self.assertEqual(1, 3)
-    
-    def test_this_thing_works3(self):
-        self.assertEqual(1, )
+        # Name should no be valid when empty
+        self.assertFalse(form.is_valid())
 
-    def test_this_thing_works4(self):
-        self.assertEqual(1, 4)
+        # If assert is false, send back dictionary of fields and error messages
+        # Check for name key
+        self.assertIn('name', form.errors.keys())
+
+        # Assert equal to check whether the error message on the name field is 'this field is required'.
+        # Using zero index because we only want first item in our list of errors
+        self.assertEqual(form.errors['name'][0], 'This field is required.')
+
+    def test_done_field_is_not_required(self):
+        form = ItemForm({'name': 'Test Todo Item'})
+        self.assertTrue(form.is_valid())
+
+    # Fields are defined in forms.py
+    def test_fields_are_explicit_in_form_metaclass(self):
+        """
+        Ensuring fields are defined explicitly.
+        Won't accidentally display information we don't want it to.
+        Stops reordering of fields.
+        """
+        form = ItemForm()
+        self.assertEqual(form.Meta.fields, ['name', 'done'])
+
+
